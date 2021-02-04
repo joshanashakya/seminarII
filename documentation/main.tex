@@ -1,0 +1,101 @@
+\documentclass[12pt, a4paper]{report}
+\usepackage[margin=1in]{geometry}
+\usepackage{times}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{amsmath}
+\usepackage{enumerate}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{titlesec}
+\usepackage{titletoc}
+\usepackage{caption}
+\usepackage[backend=bibtex,style=ieee, natbib=true, sorting=nyt]{biblatex}
+\usepackage{url}
+\DeclareNameAlias{author}{last-first}
+\DeclareFieldFormat{urldate}{[Accessed: #1]}
+\DeclareFieldFormat{doi}{doi\addcolon\space\ifhyperref{\href{https://doi.org/#1}{\nolinkurl{#1}}}{\nolinkurl{#1}}}
+\DeclareFieldFormat[misc]{title}{\mkbibquote{#1}}
+\urlstyle{same}
+\addbibresource{references.bib}
+
+% justify text without hyphen
+\tolerance=1
+\emergencystretch=\maxdimen
+\hyphenpenalty=10000
+\hbadness=10000
+
+
+\renewcommand{\contentsname}{Table of Contents}
+\newcommand{\dottedline}[1]{\makebox[#1]{\dotfill}}
+\renewcommand{\baselinestretch}{1.5}
+%\renewcommand\refname{References}
+\setlength{\parindent}{0pt}
+
+\titlecontents{chapter}[0pt]{\bfseries}{\MakeUppercase{\chaptername\ \thecontentslabel\quad}\MakeUppercase}{\MakeUppercase}{\dotfill\contentspage}
+
+\titlecontents{table}[0pt]{}{Table~ \thecontentslabel\quad}{}{\dotfill\contentspage}
+
+\titleformat{\chapter}{\Large\bfseries\center\MakeUppercase}{\chaptertitlename\ \thechapter}{10pt}{}
+
+\titlespacing{\chapter}{0pt}{-50pt}{20pt}
+
+\captionsetup[table]{skip=0pt,singlelinecheck=off,textfont=bf,labelfont=bf}
+
+\begin{document}
+\input{cover}
+\input{supervisor_recommendation}
+
+\chapter*{Certificate of Approval}
+\input{certificate_of_approval}
+
+\pagenumbering{roman}
+\setcounter{page}{4}
+
+\chapter*{Acknowledgement}
+\input{chapters/acknowledgement}
+\addcontentsline{toc}{chapter}{Acknowledgement}
+
+\chapter*{Abstract}
+\input{chapters/abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+\newpage
+\addcontentsline{toc}{chapter}{Table of Contents}
+\tableofcontents
+
+\newpage
+\addcontentsline{toc}{chapter}{List of Tables}
+\listoftables
+
+\chapter*{Abbreviations}
+\addcontentsline{toc}{chapter}{Abbreviations}
+\input{chapters/abbreviations}
+
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\chapter{Introduction}
+\input{chapters/chapter_01}
+
+\chapter{Literature Review}
+\input{chapters/chapter_02}
+
+\chapter{Methodology}
+\input{chapters/chapter_03}
+
+\chapter{Experimentation}
+\input{chapters/chapter_04}
+
+\chapter{Result and Analysis}
+\input{chapters/chapter_05}
+
+\chapter{Conclusion}
+\input{chapters/chapter_06}
+
+\newpage
+\addcontentsline{toc}{chapter}{References}
+\printbibliography[title={References}]
+
+\end{document}

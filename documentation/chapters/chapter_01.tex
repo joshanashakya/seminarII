@@ -1,0 +1,33 @@
+\section{Background}
+We usually use machine learning methods for classification and regression problems with single output.  But what if we need to predict multiple, correlated outputs simultaneously? Such problems include diverse set of tasks, for example, natural language parsing, protein structure prediction, or image segmentation. Structured output prediction is the branch of machine learning that solves these problems. It is the problem of teaching machines to predict complex structured objects and is very different from traditional machine learning problems, where the output set contains only simple categorical labels or real values.
+\\\\
+Given a set of training examples $S = {\{(x_1, y_1), (x_2, y_2),\ldots , (x_n, y_n )\} \in (X \times Y)^n}$, the structured output prediction learns a hypothesis $h : X \to Y$ in the following form \cite{Yu2011}:
+\begin{align}
+\label{eq_1.1}
+h(x) = \text{argmax} _{y \in Y}f(x, y)
+\end{align}
+where the function $f$ evaluates how well a particular output structure $y \in Y$ matches an input $x \in X$, and it is parameterized by the vector $w$, and the argmax over all possible $y \in Y$ extracts the highest scoring output as the prediction for $x$ and is usually computed using the combinatorial optimization algorithms.
+
+\section{Structural Support Vector Machine}
+Structural Support Vector Machine (SSVM) is a discriminative structured output prediction algorithm which allows flexible construction of features to predict complex objects. It inherits the properties of regular SVM such as flexibility in the choice of loss function and the opportunity to learn non-linear rules via kernels. 
+\\\\
+Structural SVM tries to learn the scoring function $f$ in Equation \ref{eq_1.1} such that good output structures score higher than bad output structures for a fixed input $x$. It uses disciminant function $f$ as:
+\begin{align}
+\label{eq_1.2}
+f(x, y) = w^T \cdot \psi(x, y)
+\end{align}
+where the combined feature vector function $\psi$ relates inputs and outputs, and $w$ are model parameters. The structural SVM formulation presented in Section 3.3.1 is used to learn model parameters $w$.
+
+\section{Multi-label Classification}
+Multi-label classification is a variant of the classification problem which involves predicting zero or more mutually non-exclusive class labels. In multi-label classification, the training set is composed of instances each associated with a set of labels, and the task is to predict the label sets of unseen instances through analyzing training samples with known label sets. There are two main strategies for multi-label classification:
+\begin{enumerate}[i.]
+\item Problem transformation method
+\item Algorithm adaptation method
+\end{enumerate}
+The problem transformation methods transform multi-label problem into single-label problem whereas the algorithm adaptation method adapts the algorithm to directly perform multi-label classification.
+
+\section{Problem Statement}
+Multi-label classification problem can be treated as $n$ classes independent binary classification problems. But taking class labels as atomic entities without analyzing the correlation between input and output, there is no learning, only memorization of class labels. It is necessary to enable learning across input and output space. Structural SVM extracts features from inputs and outputs, learns from the combined features to solve multi-label classification problem.
+
+\section{Objective}
+The main objective of this study is to explore structural SVM to solve multi-label classification problem on text data.

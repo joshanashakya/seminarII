@@ -1,0 +1,19 @@
+\section{Performance Evaluation}
+\subsection{Hamming Loss}
+Hamming loss computes the average Hamming distance between two sets of samples. If $\hat {y_i}$ is the predicted value for the $i-th$ label of a given sample, $y_i$ is the corresponding true value, and $n$ is the number of labels, then the Hamming loss $L$ between two samples is defined as \cite{scikit}:
+\begin{align*}
+L_{Hamming}(y, \hat{y}) = \frac{1}{n_{labels}} \sum _{i=0} ^{n_{labels} - 1} 1(\hat{y_i} \neq y_i)
+\end{align*}
+where 1(x) is the indicator function.
+
+\section{Result and Analysis}
+Table 5.1 shows the Hamming loss of the training and testing datasets obtained when using structured svm.
+\begin{table}[H]
+\textbf{\caption{Hamming loss of training set and testing set}}
+\vspace{5pt}
+\begin{tabular}{|c|c|c|} \hline
+No. of features & Training & Test \\ \hline
+3827 &  0.067347 & 0.134524 \\ \hline
+\end{tabular}
+\end{table}
+The results show that there is approximately 6\% loss in training data and 13\% loss in testing data.

@@ -1,0 +1,92 @@
+\section{Pre-processing methods}
+The datasets are processed through the pre-processing task of text documents such as multi-label binarization, tokenization, stop word removal, lowercase conversion, and stemming using Porter stemmer. Multi-label binarization encodes multiple labels (0 or 1) per instance. Tokenization is the process of splitting a text into words, phrases, or other meaningful elements called tokens. Stop words usually refer to the most common words in a language without dependency to a particular topic. In lowercase conversion, all uppercase characters are converted to their lowercase forms. Stemming refers to the process of reducing inflected words to their word stem, base, or root form.
+
+\section{Feature extraction}
+The term-weighting scheme is used to extract the most classical features as an input to the classifier. The more classical the features, the better performance of the classifier will be. The term-weighting schemes applied in the experiment is unigram Term Frequency Inverse Document Frequency (TF-IDF). The TF-IDF measure is given by:
+\begin{align*}
+\label{tf_idf}
+v_{ij} = \frac{f_{ij}}{fd_j} \times \log \left( \frac{|D|}{ft_i} \right)
+\end{align*}
+where $|D|$ is the total number of documents, $f_{ij}$ is the number of occurrences of term $i$ in document $j$, $fd_j$ is the total numbers of terms occurring in document $j$, and $ft_i$ the total number of documents in which term $i$ appears at least once.
+
+\section{Text Classification}
+
+\subsection{Structural SVM Optimization Problem}
+Given a discriminant function of the form $f(x, y) = \langle w, \psi (x, y)\rangle$, with hypotheses of the form $h(x) = \text{argmax}_{y \in Y} f(x, y)$, where $h(x)$ is a hypothesis parameterized by $w$ with training pairs in the form $S = \{(x_i, y_i) \in X \times Y : i = 1,2,\ldots,n\}$, the hypothesis $h(x)$ may be learned with the following quadratic program \cite{Finley2009} :
+\begin{align}
+&\min _{w, \ \xi} \ \frac{1}{2}||w||^2 + \frac{C}{n}\sum_{i=1}^{n} \xi _i \\
+s.t.\ \forall i&: \xi _i \geq 0,\\
+\forall i, \forall y \in Y&: \langle w, \psi (x_i, y_i) \rangle \geq \langle w, \psi(x_i, y) \rangle + \Delta(y_i, y) - \xi _i
+\end{align}
+The loss $\Delta(y_i, y)$ of the constraint’s associated output $y$ is incorporated as the margin between the discriminant function for the correct output $\langle w, \psi(x_i, y_i)\rangle$ and the incorrect output $y$\rq s discriminant function $\langle w, \psi(x_i, y)\rangle$.
+
+\subsection{Cutting Plane Algorithm}
+The complication with SSVM optimization problem is that there are as many constraints as there are possible labels. For example, in multi-label classification, for a sample size $m$ where there are $l$ possible labels for each sample, there would be $l$ number of constraints. Despite an immense number of constraints, structural SVM employs an Algorithm 1 to solve the optimization problem efficiently.
+
+\begin{algorithm}
+\caption{Structural SVM Cutting Plane Algorithm}
+\begin{algorithmic}[1]
+\State Input: $(x_1, y_1), \ldots, (x_n, y_n), C, \epsilon $
+\State $ S_i \gets \phi$ for all $i = 1, \ldots, n$
+\Repeat
+\For{i=1, \ldots, n}
+	\State $H(y) \equiv \Delta(y_i, y) + \langle w, \psi (x_i, y) \rangle - \langle w, \psi (x_i, y_i) \rangle$ for margin scaling
+	\State $H(y) \equiv (\langle w, \psi (x_i, y) \rangle - \langle w, \psi (x_i, y_i) \rangle + 1) \Delta(y_i, y)$ for slack scaling
+	\State compute $\hat{y} = $ argmax$_{y \in Y} H(y)$
+	\State compute $\xi _i = \max \{0, \max _{y\in S_i} H(y) \}$
+	\If{$H(\hat{y}) > \xi _i + \epsilon$}
+		\State $S_i \gets S_i \cup \{\hat{y}\}$
+		\State $w \gets $ optimize primal over $\cup _i S_i$
+	\EndIf
+	
+\EndFor
+\Until no $S_i$ has changed during iteration
+\end{algorithmic}
+\end{algorithm}
+
+The algorithm starts with an empty set of constraints, iteratively finds the most violated constraint, add this constraint into a working set, and reoptimizes the quadratic program with this additioinal constraint. The most violated constraint for a training example $(x_i, y_i)$ is the constraint in the full QP that requires the highest slack $\xi _i$ and is determined by solving 
+\begin{align}
+\hat{y} = \text{argmax} _{y \in Y} H(y)
+\end{align}
+where the cost function $H$ is:
+\begin{align}
+H(y) \equiv \langle w, \psi(x_i, y) \rangle - \langle w, \psi (x_i, y_i) \rangle + \Delta (y_i, y)
+\end{align}
+If the constraint is violated by more than a predefined tolerance $\epsilon$, then the constraint is added, and otherwise it is ignored. The algorithm terminates when no valid constraint is added \cite{Finley2009}.
+
+\subsection{1-Slack Structural SVM}
+1-slack structural SVM reformulates the structural SVM quadratic problem by combining examples in a training set $S = \{(x_1, y_1), \ldots , (x_n, y_n)\}$ into a single training example. There is no slack vector $\xi = \xi _1, \ldots , \xi_n$ for every training example, but rather a single scalar slack variable $\xi$.
+\begin{align}
+&\min _{w, \xi} \frac{1}{2} ||w||^2 + C\xi \\
+s.t. \forall i &: \xi _i \geq 0, \\
+\forall (\bar{y_1}, \ldots, \bar{y_n}) \in Y^n &: \left \langle w, \frac{1}{n} \sum _{i=1} ^{n} \psi(x_i, y_i) \right\rangle \\
+& \geq \left \langle w, \frac{1}{n} \sum _{i=1} ^{n} \psi(x_i, \bar{y_i}) \right\rangle + \frac{1}{n} \sum _{i=1} ^{n} \Delta(y_i, \bar{y_i}) - \xi
+\end{align}
+\\
+The idea of this optimization problem (OP) is that there is a constraint for every single combination of outputs across all training examples. This is in contrast to OP previously defined, which has a family of constraints for each training example, with one constraint per example per output \cite{Finley2009}.
+\\\\
+\newpage
+The cutting plane algorithm analogous to Algorithm 1 to solve the above OP is:
+\begin{algorithm}
+\caption{Structural SVM Cutting Plane Algorithm}
+\begin{algorithmic}[1]
+\State Input: $(x_1, y_1), \ldots, (x_n, y_n), \ C, \ \epsilon $
+\State $ S_i \gets \phi$
+\For{i=1, \ldots, n}
+	\State \{set up cost functions\}
+	\State $H_i(y) \equiv \Delta(y_i, y) + \langle w, \psi (x_i, y) \rangle - \langle w, \psi (x_i, y_i) \rangle$ for margin scaling
+	\State $H_i(y) \equiv (\langle w, \psi (x_i, y) \rangle - \langle w, \psi (x_i, y_i) \rangle + 1) \Delta(y_i, y)$ for slack scaling
+\EndFor
+\Repeat
+	\For{i=1, \ldots, n}
+		\State compute $\hat{y_i} = $ argmax$_{y \in Y} H_i(y)$
+	\EndFor
+	\State compute $\xi = \frac{1}{n} \max _{(\bar{y_1}, \ldots, \bar{y_n}) \in S} \sum _{i=1} ^ {n} \max(0, H_i(\bar{y_i}))$
+	\If{$\frac{1}{n} \sum _{i=1} ^{n} H_i(\hat{y_i}) > \xi + \epsilon$}
+		\State $S \gets S \cup \{(\hat{y_1}, \ldots, \hat{y_n})\}$
+		\State $w \gets $ optimize primal over $S$
+	\EndIf
+\Until $S$ has not changed during iteration
+
+\end{algorithmic}
+\end{algorithm}
