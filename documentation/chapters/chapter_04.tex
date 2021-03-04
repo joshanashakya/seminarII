@@ -43,11 +43,11 @@ Anaconda distribution of Python 3.6 is used as programming language. The other l
 
 \section{Parameters}
 \begin{enumerate}[i.]
-\item The number of features taken is 3827.
+\item The vocabulary size is 3827.
 \item The inference method method used is qpbo.
-\item inference\_cache = 50
+\item The inference\_cache is 50 as in pystruct documentation. If  $>$ 0 the most violating of the cached examples will be used to construct a global constraint.
 \item The cost of constraints violation, $C$ is taken $0.1$.
-\item The tolerance, tol is taken 0.01 as in pystruct documentation.
+\item The convergence tolerance, tol is taken 0.01 as in pystruct documentation. If dual objective decreases less than tol, learning is stopped. The default corresponds to ignoring the behavior of the dual objective and stop only if no more constraints can be found.
 \item The maximum number of iterations defined in pystruct is 10000.
 \end{enumerate}
 

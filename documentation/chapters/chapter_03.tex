@@ -1,8 +1,8 @@
 \section{Pre-processing methods}
 The datasets are processed through the pre-processing task of text documents such as multi-label binarization, tokenization, stop word removal, lowercase conversion, and stemming using Porter stemmer. Multi-label binarization encodes multiple labels (0 or 1) per instance. Tokenization is the process of splitting a text into words, phrases, or other meaningful elements called tokens. Stop words usually refer to the most common words in a language without dependency to a particular topic. In lowercase conversion, all uppercase characters are converted to their lowercase forms. Stemming refers to the process of reducing inflected words to their word stem, base, or root form.
 
-\section{Feature extraction}
-The term-weighting scheme is used to extract the most classical features as an input to the classifier. The more classical the features, the better performance of the classifier will be. The term-weighting schemes applied in the experiment is unigram Term Frequency Inverse Document Frequency (TF-IDF). The TF-IDF measure is given by:
+\section{Vectorization}
+The term-weighting scheme is used to vectorized the text in the document. The term-weighting schemes applied in the experiment is unigram Term Frequency Inverse Document Frequency (TF-IDF). The TF-IDF measure is given by:
 \begin{align*}
 \label{tf_idf}
 v_{ij} = \frac{f_{ij}}{fd_j} \times \log \left( \frac{|D|}{ft_i} \right)
@@ -10,7 +10,7 @@ v_{ij} = \frac{f_{ij}}{fd_j} \times \log \left( \frac{|D|}{ft_i} \right)
 where $|D|$ is the total number of documents, $f_{ij}$ is the number of occurrences of term $i$ in document $j$, $fd_j$ is the total numbers of terms occurring in document $j$, and $ft_i$ the total number of documents in which term $i$ appears at least once.
 
 \section{Text Classification}
-
+In the experiment, 1-slack Structural SVM was used for the classification.
 \subsection{Structural SVM Optimization Problem}
 Given a discriminant function of the form $f(x, y) = \langle w, \psi (x, y)\rangle$, with hypotheses of the form $h(x) = \text{argmax}_{y \in Y} f(x, y)$, where $h(x)$ is a hypothesis parameterized by $w$ with training pairs in the form $S = \{(x_i, y_i) \in X \times Y : i = 1,2,\ldots,n\}$, the hypothesis $h(x)$ may be learned with the following quadratic program \cite{Finley2009} :
 \begin{align}
@@ -30,8 +30,7 @@ The complication with SSVM optimization problem is that there are as many constr
 \State $ S_i \gets \phi$ for all $i = 1, \ldots, n$
 \Repeat
 \For{i=1, \ldots, n}
-	\State $H(y) \equiv \Delta(y_i, y) + \langle w, \psi (x_i, y) \rangle - \langle w, \psi (x_i, y_i) \rangle$ for margin scaling
-	\State $H(y) \equiv (\langle w, \psi (x_i, y) \rangle - \langle w, \psi (x_i, y_i) \rangle + 1) \Delta(y_i, y)$ for slack scaling
+	\State $H(y) \equiv \Delta(y_i, y) + \langle w, \psi (x_i, y) \rangle - \langle w, \psi (x_i, y_i) \rangle$
 	\State compute $\hat{y} = $ argmax$_{y \in Y} H(y)$
 	\State compute $\xi _i = \max \{0, \max _{y\in S_i} H(y) \}$
 	\If{$H(\hat{y}) > \xi _i + \epsilon$}
@@ -68,14 +67,13 @@ The idea of this optimization problem (OP) is that there is a constraint for eve
 \newpage
 The cutting plane algorithm analogous to Algorithm 1 to solve the above OP is:
 \begin{algorithm}
-\caption{Structural SVM Cutting Plane Algorithm}
+\caption{1-Slack Structural SVM Cutting Plane Algorithm}
 \begin{algorithmic}[1]
 \State Input: $(x_1, y_1), \ldots, (x_n, y_n), \ C, \ \epsilon $
 \State $ S_i \gets \phi$
 \For{i=1, \ldots, n}
 	\State \{set up cost functions\}
-	\State $H_i(y) \equiv \Delta(y_i, y) + \langle w, \psi (x_i, y) \rangle - \langle w, \psi (x_i, y_i) \rangle$ for margin scaling
-	\State $H_i(y) \equiv (\langle w, \psi (x_i, y) \rangle - \langle w, \psi (x_i, y_i) \rangle + 1) \Delta(y_i, y)$ for slack scaling
+	\State $H_i(y) \equiv \Delta(y_i, y) + \langle w, \psi (x_i, y) \rangle - \langle w, \psi (x_i, y_i) \rangle$
 \EndFor
 \Repeat
 	\For{i=1, \ldots, n}
